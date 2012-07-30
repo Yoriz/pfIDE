@@ -1,6 +1,7 @@
 import wx.aui
 import wx
 import wx.lib.agw.flatnotebook as fnb
+import os.path
 
 from pfIDE.editor.editor import Editor
 
@@ -34,9 +35,19 @@ class TabPanel(wx.Panel):
         self.sizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 0)
         self.new_tab(None) #TODO: Should open last tab
 
-    def new_tab(self, event):
+    def new_tab(self, event, tab_name="untitled"):
         """Create and add a new tab to the notebook."""
         tab = Tab(self)
-        self.notebook.AddPage(tab, "untitled")
+        self.notebook.AddPage(tab, tab_name)
         self.current_tab = tab
         wx.CallAfter(self.notebook.SetSelection, self.notebook.GetPageCount() - 1)
+
+    def open_tab(self, event):
+        open_dialog = wx.FileDialog(self, "Choose a file", "", "", "*.*", wx.OPEN)
+        if open_dialog.ShowModal() == wx.ID_OK:
+            filename = open_dialog.GetFilename()
+            dirname = open_dialog.GetDirectory()
+            self.new_tab(None, tab_name=filename)
+            with open(os.path.join(dirname, filename),'r') as input:
+                self.current_tab.editor.SetText(input.read())
+            open_dialog.Destroy()

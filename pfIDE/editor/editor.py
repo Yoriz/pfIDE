@@ -1,3 +1,5 @@
+import os
+import os.path
 import wx.stc
 
 from pfIDE.editor.menubar import ID_OPEN, ID_SAVE, ID_SAVE_AS
@@ -15,9 +17,10 @@ class Editor(wx.stc.StyledTextCtrl):
     The editor represents the actual StyledTextCtrl and all event handling on the Text level
     should be done here.
     """
-    def __init__(self, *args, **kwargs):
-        super(Editor, self).__init__(*args, **kwargs)
+    def __init__(self, parent, *args, **kwargs):
+        super(Editor, self).__init__(parent,*args, **kwargs)
         self.load_configuration()
+        self.parent = parent # The panel that contains the editor.
         self.filepath = ""
         self.indent_level = 0
         self.SetLexer(wx.stc.STC_LEX_PYTHON)
@@ -33,25 +36,22 @@ class Editor(wx.stc.StyledTextCtrl):
 
     def event_manager(self, event):
         """
-        Handle events.
+        Take the event code fired from the MenuBar and process it.
         """
-
         # event parser
         id = event.GetId()
         if id == ID_SAVE:
             pass
-        if id == ID_OPEN:
+        elif id == ID_OPEN:
             dirname = ""
             open_dialog = wx.FileDialog(self, "Choose a file", dirname, "", "*.*", wx.OPEN)
             if open_dialog.ShowModal() == wx.ID_OK:
                 filename = open_dialog.GetFilename()
                 dirname = open_dialog.GetDirectory()
-
-                filehandle = open(os.path.join(dirname, filename),'r')
-                #self.text_editor.SetValue(filehandle.read())
-                filehandle.close()
-
+                with open(os.path.join(dirname, filename),'r') as input:
+                    self.SetText(input.read())
                 open_dialog.Destroy()
+
 
     def set_styles(self, lang='python'):
         """"""

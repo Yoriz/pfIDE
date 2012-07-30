@@ -16,10 +16,15 @@ class MenuBar(wx.MenuBar):
         self.quit_event = self.file.Append(wx.ID_EXIT, "Exit", "Exits the Application")
         self.Append(self.file, "&File")
 
+        # quit is bound to IDEFrame
         self.parent.Bind(wx.EVT_MENU, self.parent.on_quit, self.quit_event)
-        self.parent.Bind(wx.EVT_MENU, self.parent.tab_panel.new_tab, self.new_tab_event)
 
+        # new tab and open are bound to TabPanel which manages notebook
+        self.parent.Bind(wx.EVT_MENU, self.parent.tab_panel.new_tab, self.new_tab_event)
+        self.parent.Bind(wx.EVT_MENU,self.parent.tab_panel.open_tab, self.open_tab_event)
+
+        # These changes relate directly to the editors, they are bound there.
         def bind_to_editor(event):
             self.parent.Bind(wx.EVT_MENU, self.parent.tab_panel.current_tab.editor.event_manager, event)
-        for event in [self.save_as_tab_event, self.save_tab_event, self.open_tab_event]:
+        for event in [self.save_as_tab_event, self.save_tab_event]:
             bind_to_editor(event)
