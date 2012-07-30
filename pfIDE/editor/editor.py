@@ -7,3 +7,6 @@ class Editor(wx.stc.StyledTextCtrl):
     """
     def __init__(self, *args, **kwargs):
         super(Editor, self).__init__(*args, **kwargs)
+
+    def event_manager(self, event):
+        print event.GetId()

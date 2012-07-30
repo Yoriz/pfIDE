@@ -32,9 +32,9 @@ class TabPanel(wx.Panel):
                                         fnb.FNB_NO_X_BUTTON | fnb.FNB_NO_TAB_FOCUS | fnb.FNB_VC8,
                                         pos=(-100, -100))
         self.sizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 0)
-        self.current_tab = None
+        self.new_tab(None) #TODO: Should open last tab
 
-    def new_tab(self):
+    def new_tab(self, event):
         """Create and add a new tab to the notebook."""
         tab = Tab(self)
         self.notebook.AddPage(tab, "untitled")

@@ -28,8 +28,6 @@ class IDEFrame(wx.Frame):
         self.sizer.Add(self.tab_panel, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
 
-        # for testing
-        self.tab_panel.notebook.AddPage(Tab(self.tab_panel), "untitled")
 
     def init_toolbar(self):
         self.toolbar = self.CreateToolBar()
