@@ -2,8 +2,6 @@ import wx
 
 ID_QUIT = wx.NewId()
 
-
-
 class MenuBar(wx.MenuBar):
     def __init__(self, parent, *args, **kwargs):
         super(MenuBar, self).__init__(*args, **kwargs)

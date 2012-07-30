@@ -1,6 +1,6 @@
 import wx
-from ..tabs import TabPanel, Tab
-from ..menubar import MenuBar
+from pfIDE.editor.tabs import TabPanel, Tab
+from pfIDE.editor.menubar import MenuBar
 
 class IDEFrame(wx.Frame):
     """
