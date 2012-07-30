@@ -1,6 +1,7 @@
 import wx
 from pfIDE.editor.tabs import TabPanel, Tab
 from pfIDE.editor.menubar import MenuBar
+from pfIDE.editor.config import config
 
 class IDEFrame(wx.Frame):
     """
@@ -42,6 +43,7 @@ class IDE(wx.App):
     The application that wraps the wx.Frame and provides it to the user.
     """
     def __init__(self, *args, **kwargs):
+        self.config = config.read_config()
         wx.App.__init__(self, *args, **kwargs)
 
     def OnInit(self):
