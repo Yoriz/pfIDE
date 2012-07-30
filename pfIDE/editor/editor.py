@@ -24,10 +24,26 @@ class Editor(wx.stc.StyledTextCtrl):
         self.set_styles()
 
     def event_manager(self, event):
+        """
+        Handle events.
+        """
+
         # event parser
         id = event.GetId()
         if id == ID_SAVE:
             pass
+        if id == ID_OPEN:
+            dirname = ""
+            open_dialog = wx.FileDialog(self, "Choose a file", dirname, "", "*.*", wx.OPEN)
+            if open_dialog.ShowModal() == wx.ID_OK:
+                filename = open_dialog.GetFilename()
+                dirname = open_dialog.GetDirectory()
+
+                filehandle = open(os.path.join(dirname, filename),'r')
+                #self.text_editor.SetValue(filehandle.read())
+                filehandle.close()
+
+                open_dialog.Destroy()
 
     def set_styles(self, lang='python'):
         """"""
