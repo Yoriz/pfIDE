@@ -2,7 +2,7 @@ import wx.aui
 import wx
 import wx.lib.agw.flatnotebook as fnb
 
-from pfIDE.editor.editor import Editor
+from .editor import Editor
 
 class Tab(wx.Panel):
     """
