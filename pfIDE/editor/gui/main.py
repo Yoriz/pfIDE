@@ -35,7 +35,6 @@ class IDEFrame(wx.Frame):
         #TODO: Construct and wire up the toolbar
 
     def on_quit(self, event):
-        print "Called."
         self.Destroy()
 
 class IDE(wx.App):
