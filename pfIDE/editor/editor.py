@@ -17,11 +17,19 @@ class Editor(wx.stc.StyledTextCtrl):
     """
     def __init__(self, *args, **kwargs):
         super(Editor, self).__init__(*args, **kwargs)
+        self.load_configuration()
         self.filepath = ""
         self.indent_level = 0
         self.SetLexer(wx.stc.STC_LEX_PYTHON)
         self.StyleSetSpec(wx.stc.STC_STYLE_DEFAULT, "face:%(mono)s,size:%(size)d" % faces) #set mono spacing here!
         self.set_styles()
+
+    def load_configuration(self):
+        """Apply all configuration settings"""
+        config = wx.GetApp().config
+        self.SetTabWidth(config.getint('editing', 'indent'))
+        self.SetUseTabs(config.getboolean('editing', 'usetab'))
+        #print config
 
     def event_manager(self, event):
         """
