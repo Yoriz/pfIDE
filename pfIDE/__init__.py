@@ -17,8 +17,10 @@ class IDEFrame(wx.Frame):
         """
         super(IDEFrame, self).__init__(*args, **kwargs)
         self.tab_panel = TabPanel(self)
+        self.menu_bar = MenuBar(self)
+        self.SetMenuBar(self.menu_bar)
+
         self.CreateStatusBar()
-        self.SetMenuBar(MenuBar())
 
         self.SetInitialSize((800,600)) #TODO: Attach Config
 
@@ -26,7 +28,17 @@ class IDEFrame(wx.Frame):
         self.sizer.Add(self.tab_panel, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
 
+        # for testing
         self.tab_panel.notebook.AddPage(Tab(self.tab_panel), "untitled")
+
+    def init_toolbar(self):
+        self.toolbar = self.CreateToolBar()
+        self.toolbar.SetToolBitmapSize((16,16))
+        #TODO: Construct and wire up the toolbar
+
+    def on_quit(self, event):
+        print "Called."
+        self.Destroy()
 
 class IDE(wx.App):
     """
