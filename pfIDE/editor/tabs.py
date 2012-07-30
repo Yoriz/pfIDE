@@ -1,4 +1,3 @@
-from gtk.keysyms import Tab
 import wx.aui
 import wx
 import wx.lib.agw.flatnotebook as fnb
@@ -33,12 +32,11 @@ class TabPanel(wx.Panel):
                                         fnb.FNB_NO_X_BUTTON | fnb.FNB_NO_TAB_FOCUS | fnb.FNB_VC8,
                                         pos=(-100, -100))
         self.sizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 0)
+        self.current_tab = None
 
-
-    def create_new_tab(self, title="untiled", body=None):
-        """Create and add a new tab to the notebook with optional content."""
+    def new_tab(self):
+        """Create and add a new tab to the notebook."""
         tab = Tab(self)
-        self.notebook.AddPage(tab, title)
-        if body:
-            tab.editor.SetText(body) # For when opening files.
-
+        self.notebook.AddPage(tab, "untitled")
+        self.current_tab = tab
+        wx.CallAfter(self.notebook.SetSelection, self.notebook.GetPageCount() - 1)
