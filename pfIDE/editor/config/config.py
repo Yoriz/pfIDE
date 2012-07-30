@@ -23,12 +23,12 @@ def get_config_filename():
     if system == "Windows":
         configdir = (os.environ.get("LOCALAPPDATA") or
                      os.environ.get("APPDATA"))
-    else:
+    elif os.environ.get("HOME"):
         configdir = (os.environ.get("XDG_CONFIG_HOME") or
                      os.path.join(os.environ["HOME"], ".config"))
+    else: # Let's dump it here
+        configdir = "."
 
-    if configdir is None:
-        return os.path.join(".", ".pd_ide", "config.cfg") # Dump config in the local directory
     return os.path.join(configdir, ".pf_ide", "config.cfg")
 
 def get_default_config():
