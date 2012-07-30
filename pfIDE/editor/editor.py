@@ -1,8 +1,7 @@
 import os
-import os.path
 import wx.stc
 
-from pfIDE.editor.menubar import ID_OPEN, ID_SAVE, ID_SAVE_AS
+from pfIDE.editor.menubar import ID_SAVE, ID_SAVE_AS
 
 faces = { 'times': 'Times',
           'mono' : 'Courier',
@@ -21,7 +20,8 @@ class Editor(wx.stc.StyledTextCtrl):
         super(Editor, self).__init__(parent,*args, **kwargs)
         self.load_configuration()
         self.parent = parent # The panel that contains the editor.
-        self.filepath = ""
+        self.filename = ""
+        self.dirname = ""
         self.indent_level = 0
         self.SetLexer(wx.stc.STC_LEX_PYTHON)
         self.StyleSetSpec(wx.stc.STC_STYLE_DEFAULT, "face:%(mono)s,size:%(size)d" % faces) #set mono spacing here!
@@ -41,17 +41,19 @@ class Editor(wx.stc.StyledTextCtrl):
         # event parser
         id = event.GetId()
         if id == ID_SAVE:
-            pass
-        elif id == ID_OPEN:
-            dirname = ""
-            open_dialog = wx.FileDialog(self, "Choose a file", dirname, "", "*.*", wx.OPEN)
-            if open_dialog.ShowModal() == wx.ID_OK:
-                filename = open_dialog.GetFilename()
-                dirname = open_dialog.GetDirectory()
-                with open(os.path.join(dirname, filename),'r') as input:
-                    self.SetText(input.read())
-                open_dialog.Destroy()
-
+            if (not self.filename) or (not self.dirname):
+                pass # can't save.
+            with open(os.path.join(self.dirname, self.filename), 'w') as output:
+                output.write(self.GetTextRaw())
+        elif id == ID_SAVE_AS:
+            save_dialog = wx.FileDialog(self, "Choose a file", "", "", "*.*", wx.SAVE)
+            if save_dialog.ShowModal() == wx.ID_OK:
+                self.filename = save_dialog.GetFilename()
+                self.dirname = save_dialog.GetDirectory()
+                with open(os.path.join(self.dirname, self.filename),'w') as output:
+                    output.write(self.GetTextRaw())
+                open(os.path.join(self.dirname, self.filename)).read()
+            save_dialog.Destroy()
 
     def set_styles(self, lang='python'):
         """"""
