@@ -32,7 +32,6 @@ class Editor(wx.stc.StyledTextCtrl):
         config = wx.GetApp().config
         self.SetTabWidth(config.getint('editing', 'indent'))
         self.SetUseTabs(config.getboolean('editing', 'usetab'))
-        #print config
 
     def event_manager(self, event):
         """
@@ -54,6 +53,11 @@ class Editor(wx.stc.StyledTextCtrl):
                     output.write(self.GetTextRaw())
                 open(os.path.join(self.dirname, self.filename)).read()
             save_dialog.Destroy()
+
+            # Ugh. Hack
+            root = wx.GetApp().frame
+            root.tab_panel.notebook.SetPageText(root.tab_panel.notebook.GetSelection()-1, self.filename)
+
 
     def set_styles(self, lang='python'):
         """"""
