@@ -13,8 +13,6 @@ class MenuBar(wx.MenuBar):
         self.quit_event = self.file.Append(wx.ID_EXIT, "Exit", "Exits the Application")
         self.Append(self.file, "File")
 
-        self.Bind(wx.EVT_MENU, self.parent.on_quit, self.quit_event)
-        self.Bind(wx.EVT_MENU, self.parent.tab_panel.new_tab, self.new_tab_event)
-
-    def on_quit(self):
-        self.parent.Close() # wx.Frame in this case
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_quit, self.quit_event)
+        #self.parent.Bind(wx.EVT_MENU, self.new_tab_event, self.parent.tab_panel.new_tab)
+        # FIXME: There is no new_tab function yet.
