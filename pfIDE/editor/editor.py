@@ -41,8 +41,14 @@ class Editor(wx.stc.StyledTextCtrl):
     def colon_indent(self):
         self.AddText(":")
 
-        #for keyword in ["else", "elif", "except", "finally"]:
-            #pass
+        for keyword in ["else", "elif", "except", "finally"]:
+            current_line_no = self.GetCurrentLine()
+            (current_line, current_pos) = self.GetCurLine()
+            if keyword in current_line:
+                previous_line_no = max([0, current_line_no - 1])
+                previous_indent = self.GetLineIndentation(previous_line_no)
+                new_indent = previous_indent - self.GetIndent()
+                self.SetLineIndentation(current_line_no, new_indent)
 
     def newline_indent(self):
         """Handles smart indentation for the editor when a newline is pressed"""
@@ -56,8 +62,10 @@ class Editor(wx.stc.StyledTextCtrl):
             indent_amount = self.GetIndent()
             indent = indent_amount * " "
 
+        self.GetCurrentLine()
         cursorpos = self.GetColumn(self.GetCurrentPos())
         last_line_no = self.GetCurrentLine()
+        #previous_line, cursorpos = self.GetCurLine()
         last_line = split_comments(self.GetLine(last_line_no))[0]
         indent_level = self.GetLineIndentation(last_line_no) // indent_amount
 
@@ -87,8 +95,8 @@ class Editor(wx.stc.StyledTextCtrl):
         elif shift and key == ord(';'): # ':'
             self.colon_indent()
         else:
-            print key
-            print event.GetUniChar()
+            #print key
+            #print event.GetUniChar()
             event.Skip()
 
     def event_manager(self, event):
