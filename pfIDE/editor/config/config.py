@@ -32,9 +32,6 @@ def get_config_filename():
     # Dump config in the local directory if no better location found
     return os.path.join(configdir or "", "pf_ide", "config.cfg")
 
-print get_config_filename()
-#exit()
-
 def get_default_config():
     c = ConfigParser()
     c.add_section('interface')
@@ -73,4 +70,3 @@ def write_config(c):
 def write_default_config():
     write_config(get_default_config())
 
-write_default_config()
