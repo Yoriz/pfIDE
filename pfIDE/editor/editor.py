@@ -43,8 +43,9 @@ class Editor(wx.stc.StyledTextCtrl):
 
         for keyword in ["else", "elif", "except", "finally"]:
             current_line_no = self.GetCurrentLine()
-            (current_line, current_pos) = self.GetCurLine()
-            if keyword in current_line:
+            (current_line, _) = self.GetCurLine()
+            #if keyword in current_line:
+            if current_line.lstrip().startswith(keyword):
                 previous_line_no = max([0, current_line_no - 1])
                 previous_indent = self.GetLineIndentation(previous_line_no)
                 new_indent = previous_indent - self.GetIndent()
