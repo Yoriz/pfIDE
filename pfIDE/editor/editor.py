@@ -39,8 +39,10 @@ class Editor(wx.stc.StyledTextCtrl):
         self.SetUseTabs(config.getboolean('editing', 'usetab'))
 
     def colon_indent(self):
-        print "colon"
-        pass
+        self.AddText(":")
+
+        #for keyword in ["else", "elif", "except", "finally"]:
+            #pass
 
     def newline_indent(self):
         """Handles smart indentation for the editor when a newline is pressed"""
@@ -64,7 +66,8 @@ class Editor(wx.stc.StyledTextCtrl):
         if colonpos >= 0 and cursorpos > colonpos:
             indent_level += 1
         else:
-            for token in ["return", "break", "yield"]:
+            # Unindent after certain keywords
+            for token in ["return", "break", "yield", "continue", "pass", "raise", "yield"]:
                 tokenpos = last_line.find(token)
                 if tokenpos >= 0 and cursorpos >= tokenpos + len(token):
                     indent_level = max([indent_level - 1, 0])
@@ -83,7 +86,6 @@ class Editor(wx.stc.StyledTextCtrl):
             self.newline_indent()
         elif shift and key == ord(';'): # ':'
             self.colon_indent()
-            event.Skip()
         else:
             print key
             print event.GetUniChar()
