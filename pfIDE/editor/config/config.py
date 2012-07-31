@@ -19,6 +19,8 @@ def get_config_filename():
     On unix platforms it follows the xdg_specification.
     """
 
+    # Find the right config dir
+    configdir = None
     system = platform.system()
     if system == "Windows":
         configdir = (os.environ.get("LOCALAPPDATA") or
@@ -26,10 +28,12 @@ def get_config_filename():
     elif os.environ.get("HOME"):
         configdir = (os.environ.get("XDG_CONFIG_HOME") or
                      os.path.join(os.environ["HOME"], ".config"))
-    else: # Let's dump it here
-        configdir = "."
 
-    return os.path.join(configdir, ".pf_ide", "config.cfg")
+    # Dump config in the local directory if no better location found
+    return os.path.join(configdir or "", "pf_ide", "config.cfg")
+
+print get_config_filename()
+#exit()
 
 def get_default_config():
     c = ConfigParser()
@@ -69,3 +73,4 @@ def write_config(c):
 def write_default_config():
     write_config(get_default_config())
 
+write_default_config()
