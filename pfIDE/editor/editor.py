@@ -2,6 +2,7 @@ import os
 import wx.stc
 
 from pfIDE.editor.menubar import ID_SAVE, ID_SAVE_AS
+from pfIDE.editor.textutils import split_comments
 
 faces = { 'times': 'Times',
           'mono' : 'Courier',
@@ -27,12 +28,65 @@ class Editor(wx.stc.StyledTextCtrl):
         self.StyleSetSpec(wx.stc.STC_STYLE_DEFAULT, "face:%(mono)s,size:%(size)d" % faces) #set mono spacing here!
         self.set_styles()
 
+        # Handle input so smart_indent can be implemented
+        self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
+
     def load_configuration(self):
         """Apply all configuration settings"""
         config = wx.GetApp().config
         self.SetTabWidth(config.getint('editing', 'indent'))
+        self.SetIndent(config.getint('editing', 'indent'))
         self.SetUseTabs(config.getboolean('editing', 'usetab'))
-        #print config
+
+    def colon_indent(self):
+        print "colon"
+        pass
+
+    def newline_indent(self):
+        """Handles smart indentation for the editor when a newline is pressed"""
+        # Read settings from the config file
+
+        # Determine how to indent
+        #usetab = self.conf.getboolean("editing", "usetab")
+        if self.GetUseTabs():
+            indent_amount = self.GetTabWidth()
+            indent = "\t"
+        else:
+            indent_amount = self.GetIndent()
+            indent = indent_amount * " "
+
+        cursorpos = self.GetColumn(self.GetCurrentPos())
+        last_line_no = self.GetCurrentLine()
+        last_line = split_comments(self.GetLine(last_line_no))[0]
+        indent_level = self.GetLineIndentation(last_line_no) // indent_amount
+
+        # Should we increase or decrease the indent level
+        colonpos = last_line.find(":")
+        if colonpos >= 0 and cursorpos > colonpos:
+            indent_level += 1
+        elif any(last_line.lstrip().startswith(token)
+                 for token in ["return", "break", "yield"]):
+            indent_level = max([indent_level - 1, 0])
+
+        # Perform the actual smartindent
+        self.NewLine()
+        self.AddText(indent * indent_level)
+
+    def on_key_down(self, event):
+        key = event.GetKeyCode()
+        control = event.ControlDown()
+        alt = event.AltDown()
+        shift = event.ShiftDown()
+
+        if key == wx.WXK_RETURN and not control and not alt:
+            self.newline_indent()
+        elif shift and key == ord(';'): # ':'
+            self.colon_indent()
+            event.Skip()
+        else:
+            print key
+            print event.GetUniChar()
+            event.Skip()
 
     def event_manager(self, event):
         """
