@@ -47,7 +47,6 @@ class Editor(wx.stc.StyledTextCtrl):
         # Read settings from the config file
 
         # Determine how to indent
-        #usetab = self.conf.getboolean("editing", "usetab")
         if self.GetUseTabs():
             indent_amount = self.GetTabWidth()
             indent = "\t"
@@ -64,9 +63,11 @@ class Editor(wx.stc.StyledTextCtrl):
         colonpos = last_line.find(":")
         if colonpos >= 0 and cursorpos > colonpos:
             indent_level += 1
-        elif any(last_line.lstrip().startswith(token)
-                 for token in ["return", "break", "yield"]):
-            indent_level = max([indent_level - 1, 0])
+        else:
+            for token in ["return", "break", "yield"]:
+                tokenpos = last_line.find(token)
+                if tokenpos >= 0 and cursorpos >= tokenpos + len(token):
+                    indent_level = max([indent_level - 1, 0])
 
         # Perform the actual smartindent
         self.NewLine()
