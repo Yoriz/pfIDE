@@ -1,14 +1,14 @@
+import sys
 import wx
-#from pfIDE.editor.interpreter import StdoutTab, StdoutTabPanel
-from pfIDE.editor.interpreter import StdoutTabPanel
+from pfIDE.editor.interpreter import StdoutTab, StdoutTabPanel
 from pfIDE.editor.tabs import EditorTabPanel
 from pfIDE.editor.menubar import MenuBar
 from pfIDE.editor.config import config
-import logging
 
 from twisted.internet import wxreactor
 wxreactor.install()
 from twisted.internet import reactor
+from twisted.python import log
 
 class IDEFrame(wx.Frame):
     """
@@ -53,12 +53,13 @@ class IDE(wx.App):
     The application that wraps the wx.Frame and provides it to the user.
     """
     def __init__(self, *args, **kwargs):
-        self.logger = logging.getLogger("pfIDE")
+        log.startLogging(sys.stdout)
+        self.logger = log
         self.config = config.read_config()
         self.reactor = reactor
         self.reactor.registerWxApp(self)
         wx.App.__init__(self, *args, **kwargs)
-        self.logger.info("wxAPP Initialized")
+        self.logger.msg("wxAPP Initialized")
 
     def OnInit(self):
         """
@@ -73,6 +74,7 @@ class IDE(wx.App):
         Called when the App closes down.
         """
 
+
     @property
     def tab_panel(self):
         return self.frame.editor_tab_panel
@@ -84,3 +86,5 @@ class IDE(wx.App):
     @property
     def editor(self):
         return self.tab.editor
+
+
