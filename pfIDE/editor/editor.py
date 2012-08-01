@@ -86,7 +86,9 @@ class Editor(wx.stc.StyledTextCtrl):
             # Unindent after certain keywords
             for token in ["return", "break", "yield", "continue", "pass", "raise"]:
                 tokenpos = last_line.find(token)
-                if last_line.lstrip().startswith(token) and tokenpos > 0 and cursorpos >= tokenpos + len(token):
+                if (last_line.lstrip().startswith(token) and 
+                        tokenpos > 0 and 
+                        cursorpos >= tokenpos + len(token)):
                     indent_level = max([indent_level - 1, 0])
 
         # Perform the actual smartindent
