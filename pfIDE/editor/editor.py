@@ -72,11 +72,11 @@ class Editor(wx.stc.StyledTextCtrl):
 
         # Should we increase or decrease the indent level
         colonpos = last_line.find(":")
-        if colonpos >= 0 and cursorpos > colonpos:
+        if 0 <= colonpos < cursorpos:
             indent_level += 1
         else:
             # Unindent after certain keywords
-            for token in ["return", "break", "yield", "continue", "pass", "raise", "yield"]:
+            for token in ["return", "break", "yield", "continue", "pass", "raise"]:
                 tokenpos = last_line.find(token)
                 if tokenpos >= 0 and cursorpos >= tokenpos + len(token):
                     indent_level = max([indent_level - 1, 0])
