@@ -1,7 +1,9 @@
 import wx
-from pfIDE.editor.tabs import TabPanel, Tab
+from pfIDE.editor.interpreter import StdoutPanel
+from pfIDE.editor.tabs import TabPanel
 from pfIDE.editor.menubar import MenuBar
 from pfIDE.editor.config import config
+import logging
 
 class IDEFrame(wx.Frame):
     """
@@ -18,6 +20,7 @@ class IDEFrame(wx.Frame):
         """
         super(IDEFrame, self).__init__(*args, **kwargs)
         self.tab_panel = TabPanel(self)
+        self.stdout_panel = StdoutPanel(self)
         self.menu_bar = MenuBar(self)
         self.SetMenuBar(self.menu_bar)
 
@@ -27,6 +30,7 @@ class IDEFrame(wx.Frame):
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.sizer.Add(self.tab_panel, 1, wx.EXPAND)
+        self.sizer.Add(self.stdout_panel, 2, wx.EXPAND)
         self.SetSizer(self.sizer)
 
 
@@ -43,8 +47,10 @@ class IDE(wx.App):
     The application that wraps the wx.Frame and provides it to the user.
     """
     def __init__(self, *args, **kwargs):
+        self.logger = logging.getLogger("pfIDE")
         self.config = config.read_config()
         wx.App.__init__(self, *args, **kwargs)
+        self.logger.info("wxAPP Initialized")
 
     def OnInit(self):
         """
