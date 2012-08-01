@@ -1,4 +1,6 @@
 import os
+from StringIO import StringIO
+
 import wx.stc
 from pfIDE.editor import const
 
@@ -30,6 +32,7 @@ class Editor(wx.stc.StyledTextCtrl):
         self.StyleSetSpec(wx.stc.STC_STYLE_DEFAULT, "face:%(mono)s,size:%(size)d" % faces) #set mono spacing here!
         self.set_styles()
         self.autocomp = CodeCompletion()
+        self.logger = wx.GetApp().logger
 
         # Handle input so smart_indent can be implemented
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
@@ -136,8 +139,9 @@ class Editor(wx.stc.StyledTextCtrl):
         """
         # event parser
         id = event.GetId()
+        self.logger.msg("Got event id %s" % id)
         if id == wx.ID_SAVE:
-            if (not self.filename) or (not self.dirname):
+            if not all((self.filename, self.dirname)):
                 pass # can't save.
             with open(os.path.join(self.dirname, self.filename), 'w') as output:
                 output.write(self.GetTextRaw())
@@ -149,17 +153,33 @@ class Editor(wx.stc.StyledTextCtrl):
                 with open(os.path.join(self.dirname, self.filename),'w') as output:
                     output.write(self.GetTextRaw())
                 open(os.path.join(self.dirname, self.filename)).read()
+
+                # Ugh. Hack to rename the tab.
+                root = wx.GetApp().frame
+                root.editor_tab_panel.notebook.SetPageText(root.editor_tab_panel.notebook.GetSelection()-1, self.filename)
+
             save_dialog.Destroy()
 
-            # Ugh. Hack
-            root = wx.GetApp().frame
-            root.tab_panel.notebook.SetPageText(root.tab_panel.notebook.GetSelection()-1, self.filename)
+
+
 
         elif id == const.ID_RUN:
+            self.logger.msg("Told to run script.")
             reactor = wx.GetApp().reactor
             # is the current file saved?
             if not any((self.dirname, self.filename)):
-                pass
+                # The script isn't saved. Thats okay though
+                script = StringIO()
+                stream = (token for token in self.GetText() if token != "\r")
+                for token in stream:
+                    script.write(token)
+                script.seek(0)
+                self.logger.msg(repr(script.read()))
+                args = ["python", "-c", script.read()]
+            else:
+                # So the script is saved, great just get the path!
+                path = os.path.join(self.dirname, self.filename)
+                args = ["python", path]
 
     def set_styles(self, lang='python'):
         """"""

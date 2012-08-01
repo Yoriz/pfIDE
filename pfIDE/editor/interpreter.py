@@ -54,6 +54,9 @@ class StdoutTabPanel(wx.Panel):
             pos=(-100, -100))
         self.sizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 0)
 
+    def run_script(self, source):
+        pass
+
 class StdoutTab(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         super(StdoutTab, self).__init__(*args, **kwargs)
