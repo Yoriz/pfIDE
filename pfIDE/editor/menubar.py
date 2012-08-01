@@ -27,7 +27,7 @@ class MenuBar(wx.MenuBar):
 
         # These changes relate directly to the editors, they are bound there.
         def bind_to_editor(event):
-            self.parent.Bind(wx.EVT_MENU, self.parent.editor_tab_panel.current_tab.editor.event_manager, event)
+            self.parent.Bind(wx.EVT_MENU, self.parent.editor_tab_panel.event_manager, event)
         for event in [self.save_as_tab_event, self.save_tab_event, self.run_script_event]:
             bind_to_editor(event)
 

@@ -1,8 +1,10 @@
 import os
-from StringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 import wx.stc
-from pfIDE.editor import const
 
 from pfIDE.editor.textutils import split_comments
 
@@ -135,53 +137,35 @@ class Editor(wx.stc.StyledTextCtrl):
 
         self.code_complete(event)
 
-    def event_manager(self, event):
-        """
-        Take the event code fired from the MenuBar and process it.
-        """
-        # event parser
-        id = event.GetId()
-        self.logger.msg("Got event id %s" % id)
-        if id == wx.ID_SAVE:
-            if not all((self.filename, self.dirname)):
-                pass # can't save.
-            with open(os.path.join(self.dirname, self.filename), 'w') as output:
+    def save_as(self):
+        save_dialog = wx.FileDialog(self, "Choose a file", "", "", "*.*", wx.SAVE)
+        if save_dialog.ShowModal() == wx.ID_OK:
+            self.filename = save_dialog.GetFilename()
+            self.dirname = save_dialog.GetDirectory()
+            with open(os.path.join(self.dirname, self.filename),'w') as output:
                 output.write(self.GetTextRaw())
-        elif id == wx.ID_SAVEAS:
-            save_dialog = wx.FileDialog(self, "Choose a file", "", "", "*.*", wx.SAVE)
-            if save_dialog.ShowModal() == wx.ID_OK:
-                self.filename = save_dialog.GetFilename()
-                self.dirname = save_dialog.GetDirectory()
-                with open(os.path.join(self.dirname, self.filename),'w') as output:
-                    output.write(self.GetTextRaw())
-                open(os.path.join(self.dirname, self.filename)).read()
-
                 # Ugh. Hack to rename the tab.
-                root = wx.GetApp().frame
-                root.editor_tab_panel.notebook.SetPageText(root.editor_tab_panel.notebook.GetSelection()-1, self.filename)
+            root = wx.GetApp().frame
+            root.editor_tab_panel.notebook.SetPageText(root.editor_tab_panel.notebook.GetSelection()-1, self.filename)
+        save_dialog.Destroy()
 
-            save_dialog.Destroy()
-
-
-
-
-        elif id == const.ID_RUN:
-            self.logger.msg("Told to run script.")
-            reactor = wx.GetApp().reactor
-            # is the current file saved?
-            if not any((self.dirname, self.filename)):
-                # The script isn't saved. Thats okay though
-                script = StringIO()
-                stream = (token for token in self.GetText() if token != "\r")
-                for token in stream:
-                    script.write(token)
-                script.seek(0)
-                self.logger.msg(repr(script.read()))
-                args = ["python", "-c", script.read()]
-            else:
-                # So the script is saved, great just get the path!
-                path = os.path.join(self.dirname, self.filename)
-                args = ["python", path]
+    def run(self):
+        self.logger.msg("Told to run script.")
+        stdout_tab_panel = wx.GetApp().frame.stdout_tab_panel
+        # is the current file saved?
+        if not any((self.dirname, self.filename)):
+            # The script isn't saved. Thats okay though
+            script = StringIO()
+            stream = (token for token in self.GetText() if token != "\r")
+            for token in stream:
+                script.write(token)
+            script.seek(0)
+            args = ["python", "-c", script.read()]
+        else:
+            # So the script is saved, great just get the path!
+            path = os.path.join(self.dirname, self.filename)
+            args = ["python", path]
+        stdout_tab_panel.run_script(args)
 
     def set_styles(self, lang='python'):
         """"""

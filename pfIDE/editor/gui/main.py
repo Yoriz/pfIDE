@@ -36,7 +36,7 @@ class IDEFrame(wx.Frame):
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.sizer.Add(self.editor_tab_panel, 1, wx.EXPAND)
-        self.sizer.Add(self.stdout_tab_panel, 2)
+        self.sizer.Add(self.stdout_tab_panel, 2, wx.EXPAND)
         self.SetSizer(self.sizer)
 
 
@@ -74,7 +74,6 @@ class IDE(wx.App):
         Called when the App closes down.
         """
 
-
     @property
     def tab_panel(self):
         return self.frame.editor_tab_panel
@@ -86,5 +85,4 @@ class IDE(wx.App):
     @property
     def current_editor(self):
         return self.current_tab.editor
-
 
