@@ -5,7 +5,6 @@ except ImportError:
     from StringIO import StringIO
 
 import wx.stc
-from pfIDE.editor import const
 
 from pfIDE.editor.textutils import split_comments
 
@@ -147,26 +146,6 @@ class Editor(wx.stc.StyledTextCtrl):
             root = wx.GetApp().frame
             root.editor_tab_panel.notebook.SetPageText(root.editor_tab_panel.notebook.GetSelection()-1, self.filename)
         save_dialog.Destroy()
-
-    def event_manager(self, event):
-        """
-        Take the event code fired from the MenuBar and process it.
-        """
-        id = event.GetId()
-        self.logger.msg("Got event with id %s" % event.GetId())
-        if id == wx.ID_SAVE:
-            self.logger.msg("Saving current tab.")
-            if not all((self.filename, self.dirname)):
-                self.logger.msg("Cannot call save on an unsaved file.")
-                return
-            with open(os.path.join(self.dirname, self.filename), 'w') as output:
-                self.logger.msg("File handle open, trying to save.")
-                output.write(self.GetTextRaw())
-            self.logger.msg("File handle closed, save successful")
-        elif id == wx.ID_SAVEAS:
-            self.save_as()
-        elif id == const.ID_RUN:
-            self.run()
 
     def run(self):
         self.logger.msg("Told to run script.")

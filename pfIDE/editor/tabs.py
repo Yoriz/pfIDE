@@ -2,6 +2,7 @@ import wx.aui
 import wx
 import wx.lib.agw.flatnotebook as fnb
 import os.path
+from pfIDE.editor import const
 
 from pfIDE.editor.editor import Editor
 
@@ -28,6 +29,7 @@ class EditorTabPanel(wx.Panel):
     def __init__(self, *args, **kwargs):
         super(EditorTabPanel, self).__init__(*args, **kwargs)
         self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.logger = wx.GetApp().logger
         self.SetSizer(self.sizer)
         self.notebook = fnb.FlatNotebook(self, agwStyle=fnb.FNB_X_ON_TAB |
                                         fnb.FNB_NO_X_BUTTON | fnb.FNB_NO_TAB_FOCUS | fnb.FNB_VC8,
@@ -51,3 +53,23 @@ class EditorTabPanel(wx.Panel):
             with open(os.path.join(dirname, filename),'r') as input:
                 self.current_tab.editor.SetText(input.read())
             open_dialog.Destroy()
+
+    def event_manager(self, event):
+        """
+        Take the event code fired from the MenuBar and process it.
+        """
+        id = event.GetId()
+        self.logger.msg("Got event with id %s" % id)
+        if id == wx.ID_SAVE:
+            self.logger.msg("Saving current tab.")
+            if not all((self.current_tab.editor.filename, self.current_tab.editor.dirname)):
+                self.logger.msg("Cannot call save on an unsaved file.")
+                return
+            with open(os.path.join(self.current_tab.editor.dirname, self.current_tab.editor.filename), 'w') as output:
+                self.logger.msg("File handle open, trying to save.")
+                output.write(self.current_tab.editor.GetTextRaw())
+            self.logger.msg("File handle closed, save successful")
+        elif id == wx.ID_SAVEAS:
+            self.current_tab.editor.save_as()
+        elif id == const.ID_RUN:
+            self.current_tab.editor.run()
