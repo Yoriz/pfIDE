@@ -20,13 +20,13 @@ class Tab(wx.Panel):
         self.sizer.Add(self.editor, 1, wx.EXPAND | wx.ALL, 0)
 
 
-class TabPanel(wx.Panel):
+class EditorTabPanel(wx.Panel):
     """
     The TabPanel handles the Notebook, it tries to keep it sized correctly.
     It is just for display, it should not become an API to the Notebook.
     """
     def __init__(self, *args, **kwargs):
-        super(TabPanel, self).__init__(*args, **kwargs)
+        super(EditorTabPanel, self).__init__(*args, **kwargs)
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self.sizer)
         self.notebook = fnb.FlatNotebook(self, agwStyle=fnb.FNB_X_ON_TAB |

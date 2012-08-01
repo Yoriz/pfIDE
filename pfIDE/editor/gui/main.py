@@ -1,9 +1,13 @@
 import wx
-from pfIDE.editor.interpreter import StdoutPanel
-from pfIDE.editor.tabs import TabPanel
+from pfIDE.editor.interpreter import StdoutTab, StdoutTabPanel
+from pfIDE.editor.tabs import EditorTabPanel
 from pfIDE.editor.menubar import MenuBar
 from pfIDE.editor.config import config
 import logging
+
+from twisted.internet import wxreactor
+wxreactor.install()
+from twisted.internet import reactor
 
 class IDEFrame(wx.Frame):
     """
@@ -15,12 +19,13 @@ class IDEFrame(wx.Frame):
         """
         Initialize the wx.Frame and construct the following elements;
           - The tab_panel (containing notebook)
+          - The stdout_tab_panel (containing notebook)
           - The menu bar
           - The status bar
         """
         super(IDEFrame, self).__init__(*args, **kwargs)
-        self.tab_panel = TabPanel(self)
-        self.stdout_panel = StdoutPanel(self)
+        self.editor_tab_panel = EditorTabPanel(self) # For the editors
+        self.stdout_tab_panel = StdoutTabPanel(self) # For the stdout.
         self.menu_bar = MenuBar(self)
         self.SetMenuBar(self.menu_bar)
 
@@ -29,8 +34,8 @@ class IDEFrame(wx.Frame):
         self.SetInitialSize((800,600)) #TODO: Attach Config
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.tab_panel, 1, wx.EXPAND)
-        self.sizer.Add(self.stdout_panel, 2, wx.EXPAND)
+        self.sizer.Add(self.editor_tab_panel, 1, wx.EXPAND)
+        self.sizer.Add(self.stdout_tab_panel, 2)
         self.SetSizer(self.sizer)
 
 
@@ -49,6 +54,8 @@ class IDE(wx.App):
     def __init__(self, *args, **kwargs):
         self.logger = logging.getLogger("pfIDE")
         self.config = config.read_config()
+        self.reactor = reactor
+        self.reactor.registerWxApp(self)
         wx.App.__init__(self, *args, **kwargs)
         self.logger.info("wxAPP Initialized")
 
@@ -59,3 +66,10 @@ class IDE(wx.App):
         self.frame = IDEFrame(None)
         self.frame.Show()
         return True
+
+    def OnExit(self):
+        """
+        Called when the App closes down.
+        """
+
+

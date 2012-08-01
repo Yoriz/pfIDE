@@ -1,7 +1,7 @@
 import os
 import wx.stc
+from pfIDE.editor import const
 
-from pfIDE.editor.menubar import ID_SAVE, ID_SAVE_AS
 from pfIDE.editor.textutils import split_comments
 
 from autocomplete import CodeCompletion
@@ -114,8 +114,7 @@ class Editor(wx.stc.StyledTextCtrl):
             self.code_complete(event)
         else:
             event.Skip()
-        
-        
+
     def on_evt_char(self, event):
         """This should handle most key presses, as the event passed to this
         function allows us to more accurately determine what the character is.
@@ -137,12 +136,12 @@ class Editor(wx.stc.StyledTextCtrl):
         """
         # event parser
         id = event.GetId()
-        if id == ID_SAVE:
+        if id == wx.ID_SAVE:
             if (not self.filename) or (not self.dirname):
                 pass # can't save.
             with open(os.path.join(self.dirname, self.filename), 'w') as output:
                 output.write(self.GetTextRaw())
-        elif id == ID_SAVE_AS:
+        elif id == wx.ID_SAVEAS:
             save_dialog = wx.FileDialog(self, "Choose a file", "", "", "*.*", wx.SAVE)
             if save_dialog.ShowModal() == wx.ID_OK:
                 self.filename = save_dialog.GetFilename()
@@ -156,6 +155,11 @@ class Editor(wx.stc.StyledTextCtrl):
             root = wx.GetApp().frame
             root.tab_panel.notebook.SetPageText(root.tab_panel.notebook.GetSelection()-1, self.filename)
 
+        elif id == const.ID_RUN:
+            reactor = wx.GetApp().reactor
+            # is the current file saved?
+            if not any((self.dirname, self.filename)):
+                pass
 
     def set_styles(self, lang='python'):
         """"""
