@@ -32,6 +32,7 @@ class CodeCompletion(object):
         of potential suggestions.
         """
         self._suggestions.update(dir(module))
+        self._suggestions.add(module.__name__)
     
     def add_suggestion(self, *suggest):
         """Takes at least one string as an argument; adds each argument
