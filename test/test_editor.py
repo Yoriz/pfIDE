@@ -3,16 +3,19 @@ import unittest
 from pfIDE.editor.gui.main import IDE
 
 class TestEditor(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.ide = IDE(False)
+        cls.ide.OnInit()
+        cls.ide.tab_panel.new_tab("hello")
+        cls.editor = cls.ide.current_editor
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.ide.Destroy()
+
     def setUp(self):
-        self.ide = IDE(False)
-        self.ide.OnInit()
-
-        # An editor to test with
-        self.ide.tab_panel.new_tab("hello")
-        self.editor = self.ide.current_editor
-
-    def tearDown(self):
-        self.ide.Destroy()
+        self.editor.SetText("")
 
     def test_if_indent(self):
         """Test if statement indent"""

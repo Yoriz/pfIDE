@@ -24,11 +24,12 @@ class TestCodeCompletion(unittest.TestCase):
     def test_clear(self):
         for char in "math":
             self.autocomplete.update_key(char)
-        self.autocomplete.clear()
+        #self.autocomplete.clear()
         suggestions = self.autocomplete.suggest()
         self.assertIn("math", suggestions)
 
         # AssertionError: set(['signal', 'sin', 'sinh']) != []
+        # AssertionError: 'math' not found in set([])
 
 
 

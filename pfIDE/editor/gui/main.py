@@ -80,7 +80,7 @@ class IDE(wx.App):
 
     @property
     def current_tab(self):
-        return self.tab_panel.notebook.GetCurrentPage()
+        return self.tab_panel.current_tab
 
     @property
     def current_editor(self):
