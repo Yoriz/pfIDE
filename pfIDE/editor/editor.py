@@ -45,9 +45,6 @@ class Editor(wx.stc.StyledTextCtrl):
         self.SetUseTabs(config.getboolean('editing', 'usetab'))
 
     def colon_indent(self):
-        #self.AddText(":")
-
-        print "colon indent"
 
         for keyword in ["else", "elif", "except", "finally"]:
             current_line_no = self.GetCurrentLine()
@@ -62,7 +59,6 @@ class Editor(wx.stc.StyledTextCtrl):
     def newline_indent(self):
         """Handles smart indentation for the editor when a newline is pressed"""
         # Read settings from the config file
-        print "newline indent"
 
         # Determine how to indent
         if self.GetUseTabs():
@@ -91,7 +87,7 @@ class Editor(wx.stc.StyledTextCtrl):
                     indent_level = max([indent_level - 1, 0])
 
         # Perform the actual smartindent
-        #self.NewLine()
+        self.NewLine()
         self.AddText(indent * indent_level)
 
     def on_key_down(self, event):
@@ -109,9 +105,16 @@ class Editor(wx.stc.StyledTextCtrl):
         autocomp_showing = self.AutoCompActive()
 
         if key == wx.WXK_RETURN and not control and not alt and not autocomp_showing:
+            # order of these calls is important
+            self.code_complete(event)
+            event.Skip(False)   # prevent character from being printed
+                                # other than in newline_indent()
             self.newline_indent()
-
-        self.code_complete(event)
+        elif key == wx.WXK_BACK and not control and not alt:
+            self.code_complete(event)
+        else:
+            event.Skip()
+        
         
     def on_evt_char(self, event):
         """This should handle most key presses, as the event passed to this
@@ -122,7 +125,6 @@ class Editor(wx.stc.StyledTextCtrl):
         ctrl = event.ControlDown()
         alt = event.AltDown()
         autocomp_showing = self.AutoCompActive()
-
 
         if char == ':':
             self.colon_indent()
@@ -216,4 +218,5 @@ class Editor(wx.stc.StyledTextCtrl):
         if choices:
             choices.sort()
             self.AutoCompShow(self.autocomp.len_entered-1, ' '.join(choices))
+        # Skip the event so the character will be printed.
         event.Skip()
