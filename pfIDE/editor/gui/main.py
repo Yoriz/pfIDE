@@ -74,4 +74,15 @@ class IDE(wx.App):
         Called when the App closes down.
         """
 
+    @property
+    def tab_panel(self):
+        return self.frame.editor_tab_panel
+
+    @property
+    def current_tab(self):
+        return self.tab_panel.notebook.GetCurrentPage()
+
+    @property
+    def current_editor(self):
+        return self.current_tab.editor
 
