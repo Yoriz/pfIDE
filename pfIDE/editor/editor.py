@@ -173,9 +173,6 @@ class Editor(wx.stc.StyledTextCtrl):
 
     def code_complete(self, event, keycode):
         """TODO:
-        - If you indent (via tab or SmartIndent) and then autocomplete,
-          it seems that the program automatically indents again after
-          printing the word.
         - Properly handle uppercase; the current implementation ignores
           caps lock.
         """
