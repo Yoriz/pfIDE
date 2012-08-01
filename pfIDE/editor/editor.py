@@ -4,6 +4,8 @@ import wx.stc
 from pfIDE.editor.menubar import ID_SAVE, ID_SAVE_AS
 from pfIDE.editor.textutils import split_comments
 
+from autocomplete import CodeCompletion
+
 faces = { 'times': 'Times',
           'mono' : 'Courier',
           'helv' : 'Helvetica',
@@ -27,6 +29,7 @@ class Editor(wx.stc.StyledTextCtrl):
         self.SetLexer(wx.stc.STC_LEX_PYTHON)
         self.StyleSetSpec(wx.stc.STC_STYLE_DEFAULT, "face:%(mono)s,size:%(size)d" % faces) #set mono spacing here!
         self.set_styles()
+        self.autocomp = CodeCompletion()
 
         # Handle input so smart_indent can be implemented
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
@@ -91,12 +94,18 @@ class Editor(wx.stc.StyledTextCtrl):
         alt = event.AltDown()
         shift = event.ShiftDown()
 
-        if key == wx.WXK_RETURN and not control and not alt:
+        # If the AutoComplete menu is showing, hitting return merely
+        # closes it and autocompletes; we shouldn't indent in this case.
+        autocomp_showing = self.AutoCompActive()
+
+        if key == wx.WXK_RETURN and not control and not alt and not autocomp_showing:
             self.newline_indent()
         elif shift and key == ord(';'): # ':'
             self.colon_indent()
         else:
             event.Skip()
+        
+        self.code_complete(event, key)
 
     def event_manager(self, event):
         """
@@ -161,3 +170,26 @@ class Editor(wx.stc.StyledTextCtrl):
         self.StyleSetSpec(wx.stc.STC_P_COMMENTBLOCK, "face:%(mono)s,fore:#990000,back:#C0C0C0,italic,size:%(size)d" % faces)
         # End of line where string is not closed
         self.StyleSetSpec(wx.stc.STC_P_STRINGEOL, "face:%(mono)s,fore:#000000,face:%(mono)s,back:#E0C0E0,eol,size:%(size)d" % faces)
+
+    def code_complete(self, event, keycode):
+        """TODO:
+        - Properly handle uppercase; the current implementation ignores
+          caps lock.
+        """
+        if keycode == wx.WXK_BACK:
+            self.autocomp.back()
+        else:
+            try:
+                # this isn't perfect, doesn't handle caps lock
+                if event.ShiftDown():
+                    ch = chr(event.GetUniChar())
+                else:
+                    ch = chr(event.GetUniChar()).lower()
+                self.autocomp.update_key(ch)
+            except ValueError:
+                self.autocomp.clear()
+                return
+        choices = list(self.autocomp.suggest())
+        if choices:
+            choices.sort()
+            self.AutoCompShow(self.autocomp.len_entered-1, ' '.join(choices))
