@@ -16,6 +16,7 @@ class TestEditor(unittest.TestCase):
 
     def setUp(self):
         self.editor.SetText("")
+        # Does not create new container
 
     def test_if_indent(self):
         """Test if statement indent"""

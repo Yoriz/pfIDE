@@ -5,12 +5,14 @@ from pfIDE.editor.tabs import Tab, EditorTabPanel
 from pfIDE.editor.editor import Editor
 
 class TestIde(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.ide = IDE(False)
         self.ide.OnInit()
 
     # Test properties
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(self):
         self.ide.Destroy()
 
     def test_tab_panel(self):
