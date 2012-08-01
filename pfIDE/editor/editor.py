@@ -94,7 +94,11 @@ class Editor(wx.stc.StyledTextCtrl):
         alt = event.AltDown()
         shift = event.ShiftDown()
 
-        if key == wx.WXK_RETURN and not control and not alt:
+        # If the AutoComplete menu is showing, hitting return merely
+        # closes it and autocompletes; we shouldn't indent in this case.
+        autocomp_showing = self.AutoCompActive()
+
+        if key == wx.WXK_RETURN and not control and not alt and not autocomp_showing:
             self.newline_indent()
         elif shift and key == ord(';'): # ':'
             self.colon_indent()
