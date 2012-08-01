@@ -22,8 +22,11 @@ class TestCodeCompletion(unittest.TestCase):
         # TODO: maybe it should only suggest "sin" if I enter math.sin
 
     def test_clear(self):
-        suggestions = self.autocomplete.suggest("si")
         self.autocomplete.clear()
+        suggestions = self.autocomplete.suggest("si")
         self.assertEqual(suggestions, [])
+
+        # AssertionError: set(['signal', 'sin', 'sinh']) != []
+
 
 
