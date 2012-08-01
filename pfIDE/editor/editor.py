@@ -34,6 +34,9 @@ class Editor(wx.stc.StyledTextCtrl):
         # Handle input so smart_indent can be implemented
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
 
+        # Handle character input for AutoComp
+        self.Bind(wx.EVT_CHAR, self.on_evt_char)
+
     def load_configuration(self):
         """Apply all configuration settings"""
         config = wx.GetApp().config
@@ -42,7 +45,9 @@ class Editor(wx.stc.StyledTextCtrl):
         self.SetUseTabs(config.getboolean('editing', 'usetab'))
 
     def colon_indent(self):
-        self.AddText(":")
+        #self.AddText(":")
+
+        print "colon indent"
 
         for keyword in ["else", "elif", "except", "finally"]:
             current_line_no = self.GetCurrentLine()
@@ -57,6 +62,7 @@ class Editor(wx.stc.StyledTextCtrl):
     def newline_indent(self):
         """Handles smart indentation for the editor when a newline is pressed"""
         # Read settings from the config file
+        print "newline indent"
 
         # Determine how to indent
         if self.GetUseTabs():
@@ -85,10 +91,14 @@ class Editor(wx.stc.StyledTextCtrl):
                     indent_level = max([indent_level - 1, 0])
 
         # Perform the actual smartindent
-        self.NewLine()
+        #self.NewLine()
         self.AddText(indent * indent_level)
 
     def on_key_down(self, event):
+        """This function should only handle key presses which cannot be
+        handled by on_evt_char.
+        Eg, newline, backspace.
+        """
         key = event.GetKeyCode()
         control = event.ControlDown()
         alt = event.AltDown()
@@ -100,12 +110,24 @@ class Editor(wx.stc.StyledTextCtrl):
 
         if key == wx.WXK_RETURN and not control and not alt and not autocomp_showing:
             self.newline_indent()
-        elif shift and key == ord(';'): # ':'
-            self.colon_indent()
-        else:
-            event.Skip()
+
+        self.code_complete(event)
         
-        self.code_complete(event, key)
+    def on_evt_char(self, event):
+        """This should handle most key presses, as the event passed to this
+        function allows us to more accurately determine what the character is.
+        """
+        key = event.GetKeyCode()
+        char = chr(event.GetUniChar())
+        ctrl = event.ControlDown()
+        alt = event.AltDown()
+        autocomp_showing = self.AutoCompActive()
+
+
+        if char == ':':
+            self.colon_indent()
+
+        self.code_complete(event)
 
     def event_manager(self, event):
         """
@@ -171,20 +193,21 @@ class Editor(wx.stc.StyledTextCtrl):
         # End of line where string is not closed
         self.StyleSetSpec(wx.stc.STC_P_STRINGEOL, "face:%(mono)s,fore:#000000,face:%(mono)s,back:#E0C0E0,eol,size:%(size)d" % faces)
 
-    def code_complete(self, event, keycode):
+    def code_complete(self, event):
         """TODO:
         - Properly handle uppercase; the current implementation ignores
           caps lock.
         """
-        if keycode == wx.WXK_BACK:
+        if event.GetKeyCode() == wx.WXK_BACK:
             self.autocomp.back()
         else:
             try:
                 # this isn't perfect, doesn't handle caps lock
-                if event.ShiftDown():
-                    ch = chr(event.GetUniChar())
-                else:
-                    ch = chr(event.GetUniChar()).lower()
+                #if event.ShiftDown():
+                #    ch = chr(event.GetUniChar())
+                #else:
+                #    ch = chr(event.GetUniChar()).lower()
+                ch = chr(event.GetUniChar())
                 self.autocomp.update_key(ch)
             except ValueError:
                 self.autocomp.clear()
@@ -193,3 +216,4 @@ class Editor(wx.stc.StyledTextCtrl):
         if choices:
             choices.sort()
             self.AutoCompShow(self.autocomp.len_entered-1, ' '.join(choices))
+        event.Skip()
