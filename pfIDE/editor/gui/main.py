@@ -59,3 +59,15 @@ class IDE(wx.App):
         self.frame = IDEFrame(None)
         self.frame.Show()
         return True
+
+    @property
+    def tab_panel(self):
+        return self.frame.tab_panel
+
+    @property
+    def tab(self):
+        return self.tab_panel.notebook.GetCurrentPage()
+
+    @property
+    def editor(self):
+        return self.tab.editor
