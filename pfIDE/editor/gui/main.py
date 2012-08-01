@@ -80,11 +80,11 @@ class IDE(wx.App):
         return self.frame.editor_tab_panel
 
     @property
-    def tab(self):
+    def current_tab(self):
         return self.tab_panel.notebook.GetCurrentPage()
 
     @property
-    def editor(self):
-        return self.tab.editor
+    def current_editor(self):
+        return self.current_tab.editor
 
 
