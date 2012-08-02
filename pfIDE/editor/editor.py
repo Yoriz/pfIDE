@@ -209,6 +209,7 @@ class Editor(wx.stc.StyledTextCtrl):
         self.StyleSetSpec(wx.stc.STC_P_STRINGEOL, "face:%(mono)s,fore:#000000,face:%(mono)s,back:#E0C0E0,eol,size:%(size)d" % faces)
 
     def on_autocomp(self, event):
+        """This is called when the user selects an option from the AutoComp meny."""
         self.autocomp.key = event.Text
 
     def code_complete(self, event):
