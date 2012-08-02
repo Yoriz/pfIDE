@@ -42,6 +42,9 @@ class Editor(wx.stc.StyledTextCtrl):
         # Handle character input for AutoComp
         self.Bind(wx.EVT_CHAR, self.on_evt_char)
 
+        # Handle autocompletion
+        self.Bind(wx.stc.EVT_STC_AUTOCOMP_SELECTION, self.on_autocomp)
+
     def load_configuration(self):
         """Apply all configuration settings"""
         config = wx.GetApp().config
@@ -204,6 +207,9 @@ class Editor(wx.stc.StyledTextCtrl):
         self.StyleSetSpec(wx.stc.STC_P_COMMENTBLOCK, "face:%(mono)s,fore:#990000,back:#C0C0C0,italic,size:%(size)d" % faces)
         # End of line where string is not closed
         self.StyleSetSpec(wx.stc.STC_P_STRINGEOL, "face:%(mono)s,fore:#000000,face:%(mono)s,back:#E0C0E0,eol,size:%(size)d" % faces)
+
+    def on_autocomp(self, event):
+        self.autocomp.key = event.Text
 
     def code_complete(self, event):
         """TODO:
