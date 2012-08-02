@@ -16,6 +16,7 @@ class CodeCompletion(object):
     builtin_modules = set(builtin_module_names)
     
     def __init__(self, *modules):
+        self._namespace = []
         self._suggestions = set()
         self._cache = set()
         self._key = []
@@ -56,6 +57,9 @@ class CodeCompletion(object):
         return suggs
         
     def update_key(self, char):
+        if char == '.':
+            self._namespace.append(self.key)
+            self.clear_key()
         if not char in self.valid_ch:
             self.clear()
         else:
@@ -66,7 +70,10 @@ class CodeCompletion(object):
         try:
             self._key.pop()
         except IndexError:
-            pass
+            try:
+                self.key = self._namespace.pop()
+            except IndexError:
+                pass
     
     def cache(self, c):
         self._cache = c
