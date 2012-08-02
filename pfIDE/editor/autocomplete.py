@@ -62,6 +62,7 @@ class CodeCompletion(object):
             self._key.append(char)
     
     def back(self):
+        self.clear_cache()
         try:
             self._key.pop()
         except IndexError:
