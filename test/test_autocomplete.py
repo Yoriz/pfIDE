@@ -49,9 +49,11 @@ class TestCodeCompletion(unittest.TestCase):
         self.assertIn("math", suggestions)
 
     def test_clear(self):
-        #for char in "mathematicals":
-            #self.autocomplete.update_key(char)
+        for char in "mathematicals":
+            self.autocomplete.update_key(char)
         self.autocomplete.clear()
+        for char in "mat":
+            self.autocomplete.update_key(char)
         suggestions = self.autocomplete.suggest()
         self.assertIn("math", suggestions)
 
