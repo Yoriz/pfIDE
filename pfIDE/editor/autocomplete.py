@@ -51,6 +51,7 @@ class CodeCompletion(object):
             return set()
         pool = self._cache or self._suggestions
         suggs = set(s for s in pool if s.startswith(key))
+        suggs.discard(key)
         self._cache = set(suggs)
         return suggs
         

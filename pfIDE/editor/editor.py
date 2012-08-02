@@ -228,5 +228,7 @@ class Editor(wx.stc.StyledTextCtrl):
         if choices:
             choices.sort()
             self.AutoCompShow(self.autocomp.len_entered-1, ' '.join(choices))
+        elif self.AutoCompActive():
+            self.AutoCompCancel()
         # Skip the event so the character will be printed.
         event.Skip()
