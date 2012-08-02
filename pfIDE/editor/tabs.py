@@ -5,6 +5,7 @@ import os.path
 from pfIDE.editor import const
 
 from pfIDE.editor.editor import Editor
+from pfIDE.editor.config.config import get_config_filename
 
 class Tab(wx.Panel):
     """
@@ -45,14 +46,25 @@ class EditorTabPanel(wx.Panel):
         wx.CallAfter(self.notebook.SetSelection, self.notebook.GetPageCount() - 1)
 
     def open_tab(self, event):
+        """Opens file chosen by user"""
         open_dialog = wx.FileDialog(self, "Choose a file", "", "", "*.*", wx.OPEN)
         if open_dialog.ShowModal() == wx.ID_OK:
             filename = open_dialog.GetFilename()
             dirname = open_dialog.GetDirectory()
-            self.new_tab(None, tab_name=filename)
-            with open(os.path.join(dirname, filename),'r') as input:
-                self.current_tab.editor.SetText(input.read())
+            filepath = os.path.join(dirname, filename)
+            self.open_file(filepath)
             open_dialog.Destroy()
+
+    def edit_config(self, event):
+        """Opens the user configuration in a tab"""
+        self.open_file(get_config_filename())
+
+    def open_file(self, filepath):
+        """Create a tab to edit filename"""
+        filename = os.path.basename(filepath)
+        self.new_tab(None, tab_name=filename)
+        with open(filepath,'r') as input:
+            self.current_tab.editor.SetText(input.read())
 
     def event_manager(self, event):
         """
