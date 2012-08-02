@@ -35,7 +35,7 @@ class MenuBar(wx.MenuBar):
 
     def setup_config_menu(self):
         self.config = wx.Menu()
-        self.edit_config_event = self.config.Append(wx.ID_PREFERENCES, "Preferences", "Edits configuration settings")
+        self.edit_config_event = self.config.Append(wx.ID_PREFERENCES, "Change settings", "Edits configuration settings")
         self.parent.Bind(wx.EVT_MENU, self.parent.editor_tab_panel.edit_config)
         self.Append(self.config, "&Preferences")
 
