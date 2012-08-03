@@ -12,11 +12,11 @@ if version.is_windows():
         ENABLED = False
         win32api = None
 
-class PythonProcessProtocol(ProcessProtocol):       
+class PythonProcessProtocol(ProcessProtocol):
     def __init__(self, frame):
         self.logger = wx.GetApp().logger
         self.console = frame.console
-        
+
     def connectionMade(self):
         self.logger.msg("Connected to Python.")
 
@@ -24,24 +24,24 @@ class PythonProcessProtocol(ProcessProtocol):
         self.logger.err("Connection to process lost with reason %s" % reason)
         self.console.Newline()
         self.console.WriteText("\n\nExited with code 0")
-    
+
     def outReceived(self, data):
         self.logger.msg("Got stdout.")
         self.console.WriteText(data)
-    
+
     def errReceived(self, data):
         self.logger.err("Stderr received: %s" % data)
         self.console.Newline()
         self.console.BeginTextColour("Red")
         self.console.WriteText(data)
-        
+
     def errConnectionLost(self):
         self.logger.msg("The process closed their stderr.")
 
     def processEnded(self, reason):
         self.logger.msg("Process ended with status %d" % (reason.value.exitCode,))
 
-class StdoutTabPanel(wx.Panel):
+class StdoutTabPanel(wx.Window):
     """
     The TabPanel handles the Notebook, it tries to keep it sized correctly.
     It is just for display, it should not become an API to the Notebook.

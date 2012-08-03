@@ -21,7 +21,7 @@ class Tab(wx.Panel):
         self.sizer.Add(self.editor, 1, wx.EXPAND | wx.ALL, 0)
 
 
-class EditorTabPanel(wx.Panel):
+class EditorTabPanel(wx.Window):
     """
     The TabPanel handles the Notebook, it tries to keep it sized correctly.
     It is just for display, it should not become an API to the Notebook.
